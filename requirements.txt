@@ -1,1 +1,5 @@
 fastapi==0.115.14
+python-dotenv==1.1.1
+sqlalchemy==2.0.41
+colored==2.3.0
+psycopg2==2.9.10

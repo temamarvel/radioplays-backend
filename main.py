@@ -3,11 +3,13 @@ from fastapi import FastAPI
 
 from database import get_record_from_database
 
+import pydentic_models
+
 app = FastAPI()
 
 
-# @app.get("/audio/", response_model=list[schemas.AudioRead])
-@app.get("/audio/")
+@app.get("/audio/", response_model=list[pydentic_models.PlayRead])
+# @app.get("/audio/")
 def get_audio(search_text: str):
     records = get_record_from_database(search_text)
 

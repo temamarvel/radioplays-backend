@@ -21,19 +21,8 @@ Session = sessionmaker(bind=engine)
 
 print("DB engine created")
 
-def get_db() -> Session :
-    db = Session()
-    try:
-        yield db
-    except Exception as e:
-        print(f"{Fore.red}Error! Something went wrong during DB connection: {e}.{Style.reset}")
-        raise
-    finally:
-        db.close()
-
 def get_record_from_database(search_text: str):
-
-    with get_db() as db_session:
+    with Session() as db_session:
         try:
             return db_session.query(Play).filter(Play.name.ilike(f"%{search_text}%")).all()
         except Exception as e:

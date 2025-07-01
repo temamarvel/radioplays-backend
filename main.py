@@ -1,22 +1,18 @@
 import uvicorn
 from fastapi import FastAPI
-
-from database import get_record_from_database
-
+import database
 import pydentic_models
+
 
 app = FastAPI()
 
 
 @app.get("/audio/", response_model=list[pydentic_models.PlayRead])
-# @app.get("/audio/")
-def get_audio(search_text: str):
-    records = get_record_from_database(search_text)
-
-    for record in records:
-        print(record)
-
-    return get_record_from_database(search_text)
+def get_audios(search_text: str):
+    # todo add work with s3
+    # for each found record get signed url
+    # than create combined object for response
+    return database.search_audios_by_name(search_text)
 
 
 @app.get("/test/")

@@ -21,7 +21,7 @@ Session = sessionmaker(bind=engine)
 
 print("DB engine created")
 
-def get_record_from_database(search_text: str):
+def search_audios_by_name(search_text: str):
     with Session() as db_session:
         try:
             return db_session.query(Play).filter(Play.name.ilike(f"%{search_text}%")).all()

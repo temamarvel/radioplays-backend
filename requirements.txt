@@ -3,3 +3,7 @@ python-dotenv==1.1.1
 sqlalchemy==2.0.41
 colored==2.3.0
 psycopg2==2.9.10
+pydantic==2.11.7
+
+#for debug. remove for release
+uvicorn==0.35.0

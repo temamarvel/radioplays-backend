@@ -22,6 +22,9 @@ _s3_client = boto3.client(service_name="s3",
 def get_s3_client():
     return _s3_client
 
+def get_objects(s3_folder_key: str):
+    response = get_s3_client().list_objects_v2(Bucket=YANDEX_BUCKET, Prefix=s3_folder_key)
+    return response["Contents"]
 
 def generate_signed_url(s3_key: str, expires_in: int = 600):
     url = get_s3_client().generate_presigned_url(ClientMethod='get_object',

@@ -1,3 +1,5 @@
+import os.path
+
 import uvicorn
 from fastapi import FastAPI
 
@@ -20,7 +22,13 @@ def get_audios(search_text: str):
 
         print(files)
 
-        url = generate_signed_url(files[0]["Key"])
+        def filter_mp3(file):
+            _, ext = os.path.splitext(file["Key"])
+            return ext == ".mp3"
+
+        mp3 = filter(filter_mp3, files).__next__()
+
+        url = generate_signed_url(mp3["Key"])
 
         print(url)
 

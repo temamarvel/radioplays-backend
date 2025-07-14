@@ -5,7 +5,8 @@ class PlayBase(BaseModel):
 
 class PlayRead(PlayBase):
     id: int
-    s3_folder_key: str
+    name: str
+    url: str
 
     class Config:
         orm_mode = True

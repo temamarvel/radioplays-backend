@@ -1,7 +1,9 @@
 import uvicorn
 from fastapi import FastAPI
+
 import database
 import pydentic_models
+import alchemy_models
 from s3_storage import generate_signed_url, get_objects
 
 app = FastAPI()
@@ -9,13 +11,9 @@ app = FastAPI()
 
 @app.get("/audio/", response_model=list[pydentic_models.PlayRead])
 def get_audios(search_text: str):
-    # todo add work with s3
-    # for each found record get signed url
-    # than create combined object for response
+    audios: list[alchemy_models.Play] = database.search_audios_by_name(search_text)
 
-    audios = database.search_audios_by_name(search_text)
-
-
+    response = []
 
     for audio in audios:
         files = get_objects(audio.s3_folder_key)
@@ -25,7 +23,10 @@ def get_audios(search_text: str):
         url = generate_signed_url(files[0]["Key"])
 
         print(url)
-        # return files
+
+        response.append(pydentic_models.PlayRead(id=audio.id, name=audio.name, url=url))
+
+    return response
 
 
 @app.get("/test/")

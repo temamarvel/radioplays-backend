@@ -1,6 +1,6 @@
 import os
 import boto3
-# from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 from colored import Fore, Back, Style
 
@@ -25,6 +25,18 @@ def get_s3_client():
 def get_objects(s3_folder_key: str):
     response = get_s3_client().list_objects_v2(Bucket=YANDEX_BUCKET, Prefix=s3_folder_key)
     return response["Contents"]
+
+def is_item_uploaded(s3_key: str):
+    try:
+        get_s3_client().head_object(Bucket=YANDEX_BUCKET, Key=s3_key)
+        print(f"{Fore.green}The file {Style.bold}[{s3_key}]{Style.reset}{Fore.green} is existed in the bucket.{Style.reset}")
+        return True
+    except ClientError as e:
+        if e.response['Error']['Code'] == '404':
+            print(f"{Fore.yellow}The file {Style.bold}[{s3_key}]{Style.reset}{Fore.yellow} isn't existed in the bucket.{Style.reset}")
+        else:
+            print(f"{Fore.red}Error: {e}{Style.reset}")
+    return False
 
 def generate_signed_url(s3_key: str, expires_in: int = 600):
     url = get_s3_client().generate_presigned_url(ClientMethod='get_object',

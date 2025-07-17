@@ -6,7 +6,7 @@ from fastapi import FastAPI
 import database
 import pydentic_models
 import alchemy_models
-from s3_storage import generate_signed_url, get_objects
+from s3_storage import generate_signed_url, get_objects, is_item_uploaded
 
 app = FastAPI()
 
@@ -31,6 +31,15 @@ def get_audios(search_text: str):
         url = generate_signed_url(mp3["Key"])
 
         print(url)
+
+        # todo crete urls for covers and pass it to bot
+        ttt = get_objects(f"{audio.s3_folder_key}/Covers/")
+        # if is_item_uploaded(f"{audio.s3_folder_key}/Covers/"):
+        #     original_covers_key = f"{audio.s3_folder_key}/Covers/"
+        #     covers = get_objects(original_covers_key)
+        print(ttt)
+
+
 
         response.append(pydentic_models.PlayRead(id=audio.id, name=audio.name, url=url))
 

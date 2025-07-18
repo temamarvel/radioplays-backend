@@ -20,20 +20,7 @@ def get_audios(search_text: str):
     for audio in audios:
         files = s3_storage.get_objects(audio.s3_folder_key)
 
-        print(files)
-
-        # mp3s = (file["Key"] for file in files if file["Key"] == ".mp3")
-
         audio_urls = s3_storage.get_signed_urls(files, ".mp3")
-        print(audio_urls)
-
-        # ttt = s3_storage.get_objects(f"{audio.s3_folder_key}/Covers/")
-        # # if is_item_uploaded(f"{audio.s3_folder_key}/Covers/"):
-        # #     original_covers_key = f"{audio.s3_folder_key}/Covers/"
-        # #     covers = get_objects(original_covers_key)
-        # print(ttt)
-
-        # response.append(pydentic_models.PlayRead(id=audio.id, name=audio.name, audio_urls=audio_urls))
 
         response_object = pydentic_models.PlayRead(id=audio.id, name=audio.name, audio_urls=audio_urls)
 

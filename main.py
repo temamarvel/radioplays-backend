@@ -24,8 +24,9 @@ def get_audios(search_text: str):
 
         response_object = pydentic_models.PlayRead(id=audio.id, name=audio.name, audio_urls=audio_urls)
 
-        if s3_storage.is_folder_exists(f"{audio.s3_folder_key}/Covers/"):
-            original_cover_urls = s3_storage.get_signed_urls(files, ".webp")
+        if s3_storage.is_folder_exists(f"{audio.s3_folder_key}/Covers/Originals"):
+            original_covers = (f for f in files if "Originals" in f["Key"])
+            original_cover_urls = s3_storage.get_signed_urls(original_covers, ".webp")
             response_object.cover_urls = original_cover_urls
 
         response.append(response_object)

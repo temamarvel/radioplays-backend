@@ -22,26 +22,26 @@ def get_audios(search_text: str):
 
         print(files)
 
-        def filter_mp3(file):
-            _, ext = os.path.splitext(file["Key"])
-            return ext == ".mp3"
+        # mp3s = (file["Key"] for file in files if file["Key"] == ".mp3")
 
-        mp3 = filter(filter_mp3, files).__next__()
+        audio_urls = s3_storage.get_signed_urls(files, ".mp3")
+        print(audio_urls)
 
-        url = s3_storage.generate_signed_url(mp3["Key"])
+        # ttt = s3_storage.get_objects(f"{audio.s3_folder_key}/Covers/")
+        # # if is_item_uploaded(f"{audio.s3_folder_key}/Covers/"):
+        # #     original_covers_key = f"{audio.s3_folder_key}/Covers/"
+        # #     covers = get_objects(original_covers_key)
+        # print(ttt)
 
-        print(url)
+        # response.append(pydentic_models.PlayRead(id=audio.id, name=audio.name, audio_urls=audio_urls))
 
-        # todo crete urls for covers and pass it to bot
-        ttt = s3_storage.get_objects(f"{audio.s3_folder_key}/Covers/")
-        # if is_item_uploaded(f"{audio.s3_folder_key}/Covers/"):
-        #     original_covers_key = f"{audio.s3_folder_key}/Covers/"
-        #     covers = get_objects(original_covers_key)
-        print(ttt)
+        response_object = pydentic_models.PlayRead(id=audio.id, name=audio.name, audio_urls=audio_urls)
 
+        if s3_storage.is_folder_exists(f"{audio.s3_folder_key}/Covers/"):
+            original_cover_urls = s3_storage.get_signed_urls(files, ".webp")
+            response_object.cover_urls = original_cover_urls
 
-
-        response.append(pydentic_models.PlayRead(id=audio.id, name=audio.name, url=url))
+        response.append(response_object)
 
     return response
 

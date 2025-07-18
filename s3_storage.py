@@ -22,9 +22,11 @@ _s3_client = boto3.client(service_name="s3",
 def get_s3_client():
     return _s3_client
 
+
 def get_objects(s3_folder_key: str):
     response = get_s3_client().list_objects_v2(Bucket=YANDEX_BUCKET, Prefix=s3_folder_key)
     return response["Contents"]
+
 
 def is_item_uploaded(s3_key: str):
     try:
@@ -38,6 +40,7 @@ def is_item_uploaded(s3_key: str):
             print(f"{Fore.red}Error: {e}{Style.reset}")
     return False
 
+
 def generate_signed_url(s3_key: str, expires_in: int = 600):
     url = get_s3_client().generate_presigned_url(ClientMethod='get_object',
                                                  Params={
@@ -45,11 +48,21 @@ def generate_signed_url(s3_key: str, expires_in: int = 600):
                                                      'Key': s3_key
                                                  },
                                                  ExpiresIn=expires_in)
-    """
-    Генерирует временную ссылку для скачивания файла из S3.
-
-    :param s3_key: Путь к файлу в бакете
-    :param expires_in: Время жизни ссылки в секундах
-    :return: URL-строка
-    """
     return url
+
+
+def get_signed_urls(files, file_type: str) -> list[str]:
+    files_of_type = (file["Key"] for file in files if file["Key"].endswith(file_type))
+
+    urls = []
+    for file in files_of_type:
+        urls.append(generate_signed_url(file))
+
+    return urls
+
+
+def is_folder_exists(s3_key: str) -> bool:
+    if get_objects(s3_key):
+        return True
+    else:
+        return False

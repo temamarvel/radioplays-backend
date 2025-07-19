@@ -21,8 +21,9 @@ def get_audios(search_text: str):
         files = s3_storage.get_objects(audio.s3_folder_key)
 
         audio_urls = s3_storage.get_signed_urls(files, ".mp3")
+        streaming_urls = s3_storage.get_proxy_urls(audio_urls)
 
-        response_object = pydentic_models.PlayRead(id=audio.id, name=audio.name, audio_urls=audio_urls)
+        response_object = pydentic_models.PlayRead(id=audio.id, name=audio.name, audio_urls=audio_urls, streaming_urls=streaming_urls)
 
         if s3_storage.is_folder_exists(f"{audio.s3_folder_key}/Covers/Originals"):
             original_covers = (f for f in files if "Originals" in f["Key"])
@@ -32,6 +33,8 @@ def get_audios(search_text: str):
         response.append(response_object)
 
     return response
+
+# todo implement handle to get proxy stream url
 
 
 @app.get("/test/")

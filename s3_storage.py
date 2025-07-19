@@ -1,8 +1,11 @@
 import os
 import boto3
+import requests
+import fastapi
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 from colored import Fore, Back, Style
+import urllib.parse
 
 
 load_dotenv()
@@ -48,15 +51,37 @@ def generate_signed_url(s3_key: str, expires_in: int = 600):
                                                      'Key': s3_key
                                                  },
                                                  ExpiresIn=expires_in)
+
     return url
 
+def get_proxy_urls(signed_urls: list[str]) -> list[fastapi.responses.StreamingResponse]:
+
+    responses = []
+    for signed_url in signed_urls:
+        r = requests.get(signed_url, stream=True)
+        if r.status_code != 200:
+            raise fastapi.HTTPException(status_code=404, detail="Файл не найден в хранилище")
+
+        clean_url = urllib.parse.unquote(urllib.parse.urlparse(signed_url))
+        file_name = os.path.basename(clean_url)
+        proxy_url = fastapi.responses.StreamingResponse(
+            r.iter_content(chunk_size=8192),
+            media_type="audio/mpeg",
+            headers={
+                "Accept-Ranges": "bytes",
+                "Content-Disposition": f'inline; filename={file_name}'
+            })
+        responses.append(proxy_url)
+
+    return responses
 
 def get_signed_urls(files, file_type: str) -> list[str]:
     files_of_type = (file["Key"] for file in files if file["Key"].endswith(file_type))
 
     urls = []
     for file in files_of_type:
-        urls.append(generate_signed_url(file))
+        signed_url = generate_signed_url(file)
+        urls.append(signed_url)
 
     return urls
 

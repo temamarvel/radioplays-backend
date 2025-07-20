@@ -54,26 +54,22 @@ def generate_signed_url(s3_key: str, expires_in: int = 600):
 
     return url
 
-def get_proxy_urls(signed_urls: list[str]) -> list[fastapi.responses.StreamingResponse]:
+def get_proxy_url(signed_url: str) -> fastapi.responses.StreamingResponse:
+    response = requests.get(signed_url, stream=True)
 
-    responses = []
-    for signed_url in signed_urls:
-        r = requests.get(signed_url, stream=True)
-        if r.status_code != 200:
-            raise fastapi.HTTPException(status_code=404, detail="Файл не найден в хранилище")
+    if response.status_code != 200:
+        raise fastapi.HTTPException(status_code=404, detail="Файл не найден в хранилище")
 
-        clean_url = urllib.parse.unquote(urllib.parse.urlparse(signed_url))
-        file_name = os.path.basename(clean_url)
-        proxy_url = fastapi.responses.StreamingResponse(
-            r.iter_content(chunk_size=8192),
-            media_type="audio/mpeg",
-            headers={
-                "Accept-Ranges": "bytes",
-                "Content-Disposition": f'inline; filename={file_name}'
-            })
-        responses.append(proxy_url)
+    clean_url = urllib.parse.unquote(urllib.parse.urlparse(signed_url).path)
+    file_name = os.path.basename(clean_url)
+    # todo StreamingResponse can't work with cyrillic characters
+    # do something with it in the future
+    proxy_url = fastapi.responses.StreamingResponse(response.iter_content(chunk_size=8192),
+                                                    media_type="audio/mpeg",
+                                                    headers={"Accept-Ranges": "bytes",
+                                                             "Content-Disposition": f'inline; filename=Test_audio'})
 
-    return responses
+    return proxy_url
 
 def get_signed_urls(files, file_type: str) -> list[str]:
     files_of_type = (file["Key"] for file in files if file["Key"].endswith(file_type))

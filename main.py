@@ -10,6 +10,8 @@ import s3_storage
 
 app = FastAPI()
 
+# todo add middle ware to solve CORS issue
+
 
 @app.get("/audio/", response_model=list[pydentic_models.PlayRead])
 def get_audios(search_text: str):

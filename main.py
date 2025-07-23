@@ -26,6 +26,7 @@ app.add_middleware(
 
 @app.get("/audio/", response_model=list[pydentic_models.PlayRead])
 def get_audios(search_text: str | None = Query(None)):
+    # todo handle param = None to return all records OR first part
     audios: list[alchemy_models.Play] = database.search_audios_by_name(search_text)
 
     response = []

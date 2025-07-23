@@ -12,7 +12,6 @@ import s3_storage
 
 app = FastAPI()
 
-# todo add middle ware to solve CORS issue
 origins = [
     "http://localhost:3000",  # твой фронт при разработке
     "http://127.0.0.1:3000",  # на всякий случай

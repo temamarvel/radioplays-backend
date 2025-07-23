@@ -2,6 +2,8 @@ import os.path
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.params import Query
 
 import database
 import pydentic_models
@@ -11,10 +13,19 @@ import s3_storage
 app = FastAPI()
 
 # todo add middle ware to solve CORS issue
+origins = [
+    "http://localhost:3000",  # твой фронт при разработке
+    "http://127.0.0.1:3000",  # на всякий случай
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # можно ["*"] на dev-этапе
+)
 
 
 @app.get("/audio/", response_model=list[pydentic_models.PlayRead])
-def get_audios(search_text: str):
+def get_audios(search_text: str | None = Query(None)):
     audios: list[alchemy_models.Play] = database.search_audios_by_name(search_text)
 
     response = []

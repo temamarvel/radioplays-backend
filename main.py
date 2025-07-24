@@ -1,5 +1,3 @@
-import os.path
-
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,13 +11,13 @@ import s3_storage
 app = FastAPI()
 
 origins = [
-    "http://localhost:3000",  # твой фронт при разработке
-    "http://127.0.0.1:3000",  # на всякий случай
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # можно ["*"] на dev-этапе
+    allow_origins=origins,
 )
 
 

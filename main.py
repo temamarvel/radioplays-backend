@@ -1,3 +1,5 @@
+import fastapi
+import fastapi_pagination
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,8 +23,8 @@ app.add_middleware(
 )
 
 
-@app.get("/audio/", response_model=list[pydentic_models.PlayRead])
-def get_audios(search_text: str | None = Query(None)):
+@app.get("/audio/", response_model=fastapi_pagination.Page[pydentic_models.PlayRead])
+def get_audios(search_text: str | None = Query(None), params: fastapi_pagination.Params = fastapi.Depends()):
     # todo handle param = None to return all records OR first part
     audios: list[alchemy_models.Play] = database.search_audios_by_name(search_text)
 
@@ -42,7 +44,7 @@ def get_audios(search_text: str | None = Query(None)):
 
         response.append(response_object)
 
-    return response
+    return fastapi_pagination.paginate(response)
 
 # todo works, but test possible only on real server
 @app.get("/stream_url/")
@@ -54,6 +56,7 @@ def get_streaming_url(signed_url: str):
 def test():
     return "test response1"
 
+fastapi_pagination.add_pagination(app)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

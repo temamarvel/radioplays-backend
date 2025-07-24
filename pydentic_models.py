@@ -1,5 +1,4 @@
 from pydantic import BaseModel, conlist
-import fastapi
 
 
 class PlayBase(BaseModel):

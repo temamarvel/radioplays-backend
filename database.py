@@ -4,8 +4,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from colored import Fore, Back, Style
-
-from alchemy_models import Play
+import alchemy_models
 
 load_dotenv()
 
@@ -21,10 +20,16 @@ Session = sessionmaker(bind=engine)
 
 print("DB engine created")
 
-def search_audios_by_name(search_text: str):
+def search_audios_by_name(search_text: str | None, after_id: int, limit: int):
     with Session() as db_session:
         try:
-            return db_session.query(Play).filter(Play.name.ilike(f"%{search_text}%")).all()
+            query = db_session.query(alchemy_models.Play)
+            if search_text:
+                query = query.filter(alchemy_models.Play.name.ilike(f"%{search_text}%"))
+            if after_id:
+                query = query.filter(alchemy_models.Play.id > after_id)
+            query = query.order_by(alchemy_models.Play.id).limit(limit)
+            return query.all()
         except Exception as e:
             print(f"{Fore.red}Error! Something went wrong during query execution: {e}.{Style.reset}")
             raise

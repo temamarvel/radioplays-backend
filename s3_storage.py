@@ -28,7 +28,7 @@ def get_s3_client():
 
 def get_objects(s3_folder_key: str):
     response = get_s3_client().list_objects_v2(Bucket=YANDEX_BUCKET, Prefix=s3_folder_key)
-    return response["Contents"]
+    return response.get("Contents")
 
 
 def is_item_uploaded(s3_key: str):

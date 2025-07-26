@@ -39,10 +39,10 @@ def get_tracks(
 
         response_play = pydentic_models.Play(id=db_play.id, name=db_play.name, audio_urls=audio_urls)
 
-        if s3_storage.is_folder_exists(f"{db_play.s3_folder_key}/Covers/Originals"):
-            original_covers = (file for file in files if "Originals" in file["Key"])
-            original_cover_urls = s3_storage.get_signed_urls(original_covers, ".webp")
-            response_play.cover_urls = original_cover_urls
+        # if s3_storage.is_folder_exists(f"{db_play.s3_folder_key}/Covers/Originals"):
+        #     original_covers = (file for file in files if "Originals" in file["Key"])
+        #     original_cover_urls = s3_storage.get_signed_urls(original_covers, ".webp")
+        #     response_play.cover_urls = original_cover_urls
 
         response_plays.append(response_play)
 

@@ -33,12 +33,13 @@ def get_tracks(
     response_plays: list[pydentic_models.Play] = []
 
     for db_play in db_plays:
-        files = s3_storage.get_objects(db_play.s3_folder_key)
+        # todo uncomment when solve slow work with s3
+        # files = s3_storage.get_objects(db_play.s3_folder_key)
+        # audio_urls = s3_storage.get_signed_urls(files, ".mp3")
 
-        audio_urls = s3_storage.get_signed_urls(files, ".mp3")
+        response_play = pydentic_models.Play(id=db_play.id, name=db_play.name)
 
-        response_play = pydentic_models.Play(id=db_play.id, name=db_play.name, audio_urls=audio_urls)
-
+        # todo uncomment for prod
         # if s3_storage.is_folder_exists(f"{db_play.s3_folder_key}/Covers/Originals"):
         #     original_covers = (file for file in files if "Originals" in file["Key"])
         #     original_cover_urls = s3_storage.get_signed_urls(original_covers, ".webp")

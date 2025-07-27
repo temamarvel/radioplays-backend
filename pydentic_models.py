@@ -7,7 +7,8 @@ class PlayBase(BaseModel):
 class Play(PlayBase):
     id: int
     name: str
-    audio_urls: conlist(str, min_length=1)
+    # audio_urls: conlist(str, min_length=1)
+    audio_urls: list[str] = [] #todo ONLY for testing. In prod MUST be 1
     cover_urls: list[str] = []
 
     class ConfigDict:

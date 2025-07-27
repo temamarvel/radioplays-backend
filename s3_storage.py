@@ -72,9 +72,13 @@ def get_proxy_url(signed_url: str) -> fastapi.responses.StreamingResponse:
     return proxy_url
 
 def get_signed_urls(files, file_type: str) -> list[str]:
+    urls = []
+
+    if not files:
+        return urls
+
     files_of_type = (file["Key"] for file in files if file["Key"].endswith(file_type))
 
-    urls = []
     for file in files_of_type:
         signed_url = generate_signed_url(file)
         urls.append(signed_url)

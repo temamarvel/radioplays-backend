@@ -20,16 +20,28 @@ Session = sessionmaker(bind=engine)
 
 print("DB engine created")
 
-def search_audios_by_name(search_text: str | None, after_id: int, limit: int):
-    with Session() as db_session:
-        try:
-            query = db_session.query(alchemy_models.Play)
-            if search_text:
-                query = query.filter(alchemy_models.Play.name.ilike(f"%{search_text}%"))
-            if after_id:
-                query = query.filter(alchemy_models.Play.id > after_id)
-            query = query.order_by(alchemy_models.Play.id).limit(limit)
-            return query.all()
-        except Exception as e:
-            print(f"{Fore.red}Error! Something went wrong during query execution: {e}.{Style.reset}")
-            raise
+
+def get_session():
+    db_session = Session()
+    try:
+        yield db_session
+        db_session.commit()
+    except Exception:
+        db_session.rollback()
+        raise
+    finally:
+        db_session.close()
+
+
+def search_audios_by_name(db_session: Session, search_text: str | None, after_id: int, limit: int):
+    try:
+        query = db_session.query(alchemy_models.Play)
+        if search_text:
+            query = query.filter(alchemy_models.Play.name.ilike(f"%{search_text}%"))
+        if after_id:
+            query = query.filter(alchemy_models.Play.id > after_id)
+        query = query.order_by(alchemy_models.Play.id).limit(limit)
+        return query.all()
+    except Exception as e:
+        print(f"{Fore.red}Error! Something went wrong during query execution: {e}.{Style.reset}")
+        raise

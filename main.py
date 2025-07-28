@@ -26,9 +26,10 @@ app.add_middleware(
 def get_tracks(
         search_text: str | None = fastapi.params.Query(None),
         after_id: int = fastapi.params.Query(0),
-        limit: int = fastapi.params.Query(20) #todo default value 20? maybe not?
+        limit: int = fastapi.params.Query(20), #todo default value 20? maybe not?
+        db_session: database.Session = fastapi.Depends(database.get_session)
 ):
-    db_plays: list[alchemy_models.Play] = database.search_audios_by_name(search_text, after_id, limit)
+    db_plays: list[alchemy_models.Play] = database.search_audios_by_name(db_session, search_text, after_id, limit)
 
     response_plays: list[pydentic_models.Play] = []
 

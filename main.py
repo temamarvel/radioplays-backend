@@ -25,8 +25,8 @@ app.add_middleware(
 @app.get("/tracks/", response_model=pydentic_models.CursorPage)
 def get_tracks(
         search_text: str | None = fastapi.params.Query(None),
-        after_id: int = fastapi.params.Query(0),
-        limit: int = fastapi.params.Query(20), #todo default value 20? maybe not?
+        after_id: int = fastapi.params.Query(0, ge=0),
+        limit: int = fastapi.params.Query(20, ge=1, le=50), #todo default value 20? maybe not?
         db_session: database.Session = fastapi.Depends(database.get_session)
 ):
     db_plays: list[alchemy_models.Play] = database.search_plays_by_name(db_session, search_text, after_id, limit)
@@ -52,7 +52,7 @@ def get_tracks(
 
 
 @app.get("/tracks/{track_id}", response_model=pydentic_models.Play)
-def get_track_by_id(track_id: int, db_session: database.Session = fastapi.Depends(database.get_session)):
+def get_track_by_id(track_id: int = fastapi.Path(..., ge=0), db_session: database.Session = fastapi.Depends(database.get_session)):
     db_play: alchemy_models.Play = database.search_play_by_id(db_session, track_id)
 
     response_play = pydentic_models.Play(id=db_play.id, name=db_play.name)

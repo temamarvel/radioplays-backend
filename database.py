@@ -33,7 +33,7 @@ def get_session():
         db_session.close()
 
 
-def search_audios_by_name(db_session: Session, search_text: str | None, after_id: int, limit: int):
+def search_plays_by_name(db_session: Session, search_text: str | None, after_id: int, limit: int):
     try:
         query = db_session.query(alchemy_models.Play)
         if search_text:
@@ -42,6 +42,14 @@ def search_audios_by_name(db_session: Session, search_text: str | None, after_id
             query = query.filter(alchemy_models.Play.id > after_id)
         query = query.order_by(alchemy_models.Play.id).limit(limit)
         return query.all()
+    except Exception as e:
+        print(f"{Fore.red}Error! Something went wrong during query execution: {e}.{Style.reset}")
+        raise
+
+def search_play_by_id(db_session: Session, play_id: int):
+    try:
+        query = db_session.query(alchemy_models.Play).filter(alchemy_models.Play.id == play_id)
+        return query.first()
     except Exception as e:
         print(f"{Fore.red}Error! Something went wrong during query execution: {e}.{Style.reset}")
         raise

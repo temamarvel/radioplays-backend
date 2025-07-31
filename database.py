@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, selectinload
 from colored import Fore, Back, Style
 import alchemy_models
 
@@ -41,6 +41,7 @@ def search_plays_by_name(db_session: Session, search_text: str | None, after_id:
         if after_id:
             query = query.filter(alchemy_models.Play.id > after_id)
         query = query.order_by(alchemy_models.Play.id).limit(limit)
+        query = query.options(selectinload(alchemy_models.Play.files))
         return query.all()
     except Exception as e:
         print(f"{Fore.red}Error! Something went wrong during query execution: {e}.{Style.reset}")

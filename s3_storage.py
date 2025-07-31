@@ -6,7 +6,7 @@ from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 from colored import Fore, Back, Style
 import urllib.parse
-
+import alchemy_models
 
 load_dotenv()
 
@@ -71,13 +71,13 @@ def get_proxy_url(signed_url: str) -> fastapi.responses.StreamingResponse:
 
     return proxy_url
 
-def get_signed_urls(files, file_type: str) -> list[str]:
+def get_signed_urls(files: list[alchemy_models.S3File], file_type: str) -> list[str]:
     urls = []
 
     if not files:
         return urls
 
-    files_of_type = (file["Key"] for file in files if file["Key"].endswith(file_type))
+    files_of_type = (file.s3_key for file in files if file.type == file_type)
 
     for file in files_of_type:
         signed_url = generate_signed_url(file)

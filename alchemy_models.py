@@ -22,6 +22,7 @@ class S3File(Base):
 
     id = Column(Integer, primary_key=True)
     play_id = Column(Integer, ForeignKey("plays.id"), nullable=False)
+    type = Column(String, nullable=False)
     s3_prefix = Column(String, nullable=False)
     s3_key = Column(String, nullable=False)
 

@@ -38,7 +38,7 @@ def get_tracks(
         # files = s3_storage.get_objects(db_play.s3_folder_key)
         audio_urls = s3_storage.get_signed_urls(db_play.files, ".mp3")
 
-        response_play = pydentic_models.Play(id=db_play.id, name=db_play.name, audio_urls=audio_urls)
+        response_play = pydentic_models.Play(id=db_play.id, name=db_play.title, audio_urls=audio_urls)
 
         # todo uncomment for prod
         # if s3_storage.is_folder_exists(f"{db_play.s3_folder_key}/Covers/Originals"):
@@ -55,7 +55,7 @@ def get_tracks(
 def get_track_by_id(track_id: int = fastapi.Path(..., ge=0), db_session: database.Session = fastapi.Depends(database.get_session)):
     db_play: alchemy_models.Play = database.search_play_by_id(db_session, track_id)
 
-    response_play = pydentic_models.Play(id=db_play.id, name=db_play.name)
+    response_play = pydentic_models.Play(id=db_play.id, name=db_play.title)
 
     # todo add audio and cover urls
     if not response_play:

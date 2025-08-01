@@ -32,20 +32,19 @@ def get_tracks(
 
     response_plays: list[pydentic_models.Play] = []
 
-    for db_play in db_plays:
-        # todo uncomment when solve slow work with s3
-        # files = s3_storage.get_objects(db_play.s3_folder_key)
-        audio_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.AUDIO)
-
-        response_play = pydentic_models.Play(id=db_play.id, name=db_play.title, audio_urls=audio_urls)
-
-        # todo uncomment for prod
-        # if s3_storage.is_folder_exists(f"{db_play.s3_folder_key}/Covers/Originals"):
-        #     original_covers = (file for file in files if "Originals" in file["Key"])
-        #     original_cover_urls = s3_storage.get_signed_urls(original_covers, ".webp")
-        #     response_play.cover_urls = original_cover_urls
-
-        response_plays.append(response_play)
+    # todo uncomment for prod
+    # for db_play in db_plays:
+    #     audio_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.AUDIO)
+    #
+    #     response_play = pydentic_models.Play(id=db_play.id, name=db_play.title, audio_urls=audio_urls)
+    #
+    #     original_cover_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.ORIGINAL)
+    #     response_play.cover_urls = original_cover_urls
+    #
+    #     thumbnails_cover_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.THUMBNAIL)
+    #     response_play.thumbnail_urls = thumbnails_cover_urls
+    #
+    #     response_plays.append(response_play)
 
     return pydentic_models.CursorPage(plays=response_plays, cursor=response_plays[-1].id if response_plays else None)
 

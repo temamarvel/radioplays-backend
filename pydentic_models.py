@@ -10,6 +10,7 @@ class Play(PlayBase):
     # audio_urls: conlist(str, min_length=1)
     audio_urls: list[str] = [] #todo ONLY for testing. In prod MUST be 1
     cover_urls: list[str] = []
+    thumbnail_urls: list[str] = []
 
     class ConfigDict:
         orm_mode = True

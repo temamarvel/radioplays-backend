@@ -8,7 +8,6 @@ import pydentic_models
 import alchemy_models
 import s3_storage
 
-
 app = FastAPI()
 
 
@@ -36,7 +35,7 @@ def get_tracks(
     for db_play in db_plays:
         # todo uncomment when solve slow work with s3
         # files = s3_storage.get_objects(db_play.s3_folder_key)
-        audio_urls = s3_storage.get_signed_urls(db_play.files, ".mp3")
+        audio_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.AUDIO)
 
         response_play = pydentic_models.Play(id=db_play.id, name=db_play.title, audio_urls=audio_urls)
 

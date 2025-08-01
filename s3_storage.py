@@ -1,4 +1,6 @@
 import os
+from enum import Enum
+
 import boto3
 import requests
 import fastapi
@@ -14,6 +16,21 @@ load_dotenv()
 YANDEX_KEY_ID = os.getenv("YANDEX_KEY_ID")
 YANDEX_KEY_SECRET = os.getenv("YANDEX_KEY_SECRET")
 YANDEX_BUCKET = os.getenv("YANDEX_BUCKET")
+
+class FileKind(Enum):
+    AUDIO = ""
+    ORIGINAL = "Originals"
+    THUMBNAIL = "Thumbnails"
+
+    def get_info(self):
+        match self:
+            case FileKind.AUDIO:
+                return (self.value, ".mp3")
+            case FileKind.ORIGINAL:
+                return (self.value, ".webp")
+            case FileKind.THUMBNAIL:
+                return (self.value, ".webp")
+        return None
 
 
 _s3_client = boto3.client(service_name="s3",
@@ -71,13 +88,16 @@ def get_proxy_url(signed_url: str) -> fastapi.responses.StreamingResponse:
 
     return proxy_url
 
-def get_signed_urls(files: list[alchemy_models.S3File], file_type: str) -> list[str]:
+def get_signed_urls(files: list[alchemy_models.S3File], file_kind: FileKind) -> list[str]:
     urls = []
 
     if not files:
         return urls
 
-    files_of_type = (file.s3_key for file in files if file.type == file_type)
+    file_info = file_kind.get_info()
+    file_prefix = file_info[0]
+    file_type = file_info[1]
+    files_of_type = (file.s3_key for file in files if file_prefix in file.s3_prefix and file.type == file_type)
 
     for file in files_of_type:
         signed_url = generate_signed_url(file)

@@ -34,36 +34,30 @@ def get_tracks(
 
     # todo uncomment for prod
     for db_play in db_plays:
-        audio_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.AUDIO)
-
-        response_play = pydentic_models.Play(id=db_play.id, name=db_play.title, audio_urls=audio_urls)
-
-        original_cover_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.ORIGINAL)
-        response_play.cover_urls = original_cover_urls
-
-        thumbnails_cover_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.THUMBNAIL)
-        response_play.thumbnail_urls = thumbnails_cover_urls
+        response_play = fill_play_properties(db_play)
 
         response_plays.append(response_play)
 
     return pydentic_models.CursorPage(plays=response_plays, cursor=response_plays[-1].id if response_plays else None)
 
-
-@app.get("/tracks/{track_id}", response_model=pydentic_models.Play)
-def get_track_by_id(track_id: int = fastapi.Path(..., ge=0), db_session: database.Session = fastapi.Depends(database.get_session)):
-    db_play: alchemy_models.Play = database.search_play_by_id(db_session, track_id)
-
+# move to separate file
+# can do it with router refactoring
+def fill_play_properties(db_play: alchemy_models.Play)-> pydentic_models.Play:
     response_play = pydentic_models.Play(id=db_play.id, name=db_play.title)
-
-    # todo add audio and cover urls
-    if not response_play:
-        raise fastapi.HTTPException(status_code=404, detail="Track not found")
-
     response_play.audio_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.AUDIO)
     response_play.cover_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.ORIGINAL)
     response_play.thumbnail_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.THUMBNAIL)
 
     return response_play
+
+@app.get("/tracks/{track_id}", response_model=pydentic_models.Play)
+def get_track_by_id(track_id: int = fastapi.Path(..., ge=0), db_session: database.Session = fastapi.Depends(database.get_session)):
+    db_play: alchemy_models.Play = database.search_play_by_id(db_session, track_id)
+
+    if not db_play:
+        raise fastapi.HTTPException(status_code=404, detail="Track not found")
+
+    return fill_play_properties(db_play)
 
 # todo works, but test possible only on real server
 @app.get("/stream_url/")

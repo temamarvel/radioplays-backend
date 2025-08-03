@@ -44,9 +44,9 @@ def get_tracks(
 # can do it with router refactoring
 def fill_play_properties(db_play: alchemy_models.Play)-> pydentic_models.Play:
     response_play = pydentic_models.Play(id=db_play.id, name=db_play.title)
-    response_play.audio_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.AUDIO)
-    response_play.cover_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.ORIGINAL)
-    response_play.thumbnail_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.THUMBNAIL)
+    # response_play.audio_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.AUDIO)
+    # response_play.cover_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.ORIGINAL)
+    # response_play.thumbnail_urls = s3_storage.get_signed_urls(db_play.files, s3_storage.FileKind.THUMBNAIL)
 
     return response_play
 

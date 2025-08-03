@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from colored import Fore, Back, Style
 import urllib.parse
 import alchemy_models
+import pydentic_models
 
 load_dotenv()
 
@@ -111,3 +112,15 @@ def is_folder_exists(s3_key: str) -> bool:
         return True
     else:
         return False
+
+
+# todo may be it have to be moved to separate file
+# todo think & do it with router refactoring
+def fill_play_properties(db_play: alchemy_models.Play)-> pydentic_models.Play:
+    response_play = pydentic_models.Play(id=db_play.id, name=db_play.title)
+    # todo uncomment for prod
+    # response_play.audio_urls = get_signed_urls(db_play.files, FileKind.AUDIO)
+    # response_play.cover_urls = get_signed_urls(db_play.files, FileKind.ORIGINAL)
+    # response_play.thumbnail_urls = get_signed_urls(db_play.files, FileKind.THUMBNAIL)
+
+    return response_play
